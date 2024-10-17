@@ -80,25 +80,9 @@ function showResult() {
     }
 }
 
-function add() {
-    result = firstOperand + secondOperand;
-    formatResult();
-}
-
-function subtract() {
-    result = firstOperand - secondOperand;
-    formatResult();
-}
-
-function multiply() {
-    result = firstOperand * secondOperand;
-    formatResult();
-}
-
 function division() {
     if (secondOperand) {
         result = firstOperand / secondOperand;
-        formatResult();
         return true;
     }
     else {
@@ -115,24 +99,29 @@ const formatResult = function() {
 
 function calculateResult() {
     let success = true;
+
     if (firstOperand === 'na' || secondOperand === 'na')
         result = display.textContent;
     else {
         switch(operator) {
             case '+':
-                add();
+                result = firstOperand + secondOperand;
                 break;
             case '-':
-                subtract();
+                result = firstOperand - secondOperand;
                 break;
-            case 'x':
-                multiply();
+            case '*':
+                result = firstOperand * secondOperand;
                 break;
             case '/':
                 success = division();
                 break;
         }
     }
+
+    if (success && typeof result !== 'string')
+        formatResult();
+
     return success
 }
 
@@ -156,10 +145,19 @@ function clearMemory() {
 
 
 // Event listeners start here
+const clickEvent = new Event('click');
 
 numericBtns.forEach((number) => {
     number.addEventListener('click', () => {
         takeInputFromNumbers(number.textContent);
+    });
+
+    // Keyboard support for numbers
+    document.addEventListener('keyup', (event) => {
+        if (event.key === number.id) {
+            console.log(event.key);
+            number.dispatchEvent(clickEvent);
+        }
     });
 });
 
@@ -180,21 +178,58 @@ operatorBtns.forEach((operatorBtn) => {
             takeInputFromOperators(operatorBtn.textContent);
         });
     }
+
+    // Keyboard support for operators
+    document.addEventListener('keyup', (event) => {
+        if (event.key === operatorBtn.textContent) {
+            console.log(event.key);
+            operatorBtn.dispatchEvent(clickEvent);
+        }
+    });
 });
 
 clearBtn.addEventListener('click', clearMemory);
+
+// Keyboard event for clear
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'c') {
+        clearBtn.dispatchEvent(clickEvent);
+    }
+});
+
 resultBtn.addEventListener('click', showResult);
+
+// Keyboard event for equals
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter' && !resultBtn.attributes['disabled']) {
+        resultBtn.dispatchEvent(clickEvent);
+    }
+})
 
 backspaceBtn.addEventListener('click', () => {
     if (display.textContent.length > 1)
         display.textContent = display.textContent.slice(0, display.textContent.length-1);
 });
 
+// Keyboard event for backspace
+document.addEventListener('keyup', (event) => {
+    if (event.key === 'Backspace' && !backspaceBtn.attributes['disabled']) {
+        backspaceBtn.dispatchEvent(clickEvent);
+    }
+})
+
 decimalBtn.addEventListener('click', () => {
     if (!display.textContent.includes('.')) {
         display.textContent += '.';
     }
 });
+
+// Keyboard event for decimal point
+document.addEventListener('keyup', (event) => {
+    if (event.key === '.' && !decimalBtn.attributes['disabled']) {
+        decimalBtn.dispatchEvent(clickEvent);
+    }
+})
 // Event listeners end here
 
 // To disable operators when showing intermediate result
