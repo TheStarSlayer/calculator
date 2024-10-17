@@ -26,6 +26,10 @@ body {
     border: 1px solid black;
 }
 
+#display {
+    display: inline-block;
+}
+
 .input {
     display: flex;
     flex-direction: column;
